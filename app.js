@@ -27,8 +27,8 @@ const expSession = require("express-session")({
 
 passport.use(new LocalStrategy(User.authenticate()));
 app.use(expSession);
-// app.set("view engine", "ejs");
-// app.use(bodyParser.urlencoded({ extended: true }));
+app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(passport.initialize());
 app.use(passport.session());
