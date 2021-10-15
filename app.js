@@ -25,15 +25,15 @@ const expSession = require("express-session")({
   },
 });
 
-passport.serializeUser(User.serializeUser()); //session encoding
-passport.deserializeUser(User.deserializeUser()); //session decoding
 passport.use(new LocalStrategy(User.authenticate()));
-app.set("view engine", "ejs");
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(expSession);
+// app.set("view engine", "ejs");
+// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(expSession);
-app.use(express.static("public"));
+passport.serializeUser(User.serializeUser()); //session encoding
+passport.deserializeUser(User.deserializeUser()); //session decoding
 
 //=======================
 //      O W A S P
@@ -56,6 +56,7 @@ app.use(helmet());
 //=======================
 //      R O U T E S
 //=======================
+
 app.get("/", (req, res) => {
   res.render("home");
 });
