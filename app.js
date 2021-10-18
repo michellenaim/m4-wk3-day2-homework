@@ -11,6 +11,8 @@ const rateLimit = require("express-rate-limit");
 const xss = require("xss-clean");
 const helmet = require("helmet");
 
+const { check, validationResult } = require("express-validator");
+
 //Connecting database
 mongoose.connect("mongodb://localhost/auth_demo");
 
@@ -38,7 +40,7 @@ passport.deserializeUser(User.deserializeUser()); //session decoding
 //=======================
 //      O W A S P
 //=======================
-app.use(mongoSanitize);
+app.use(mongoSanitize());
 
 const limit = rateLimit({
   max: 100,
@@ -79,25 +81,44 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
-app.post("/register", (req, res) => {
-  User.register(
-    new User({
-      username: req.body.username,
-      email: req.body.email,
-      phone: req.body.phone,
-    }),
-    req.body.password,
-    function (err, user) {
-      if (err) {
-        console.log(err);
-        res.render("register");
-      }
-      passport.authenticate("local")(req, res, function () {
-        res.redirect("/login");
+app.post(
+  "/register",
+  [
+    check("username")
+      .isLength({ min: 1 })
+      .withMessage("Please enter a username"),
+    check("password")
+      .isLength({ min: 1 })
+      .withMessage("Please enter a password"),
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (errors.isEmpty()) {
+      User.register(
+        new User({
+          username: req.body.username,
+          email: req.body.email,
+          phone: req.body.phone,
+        }),
+        req.body.password,
+        function (err, user) {
+          if (err) {
+            console.log(err);
+            res.render("register");
+          }
+          passport.authenticate("local")(req, res, function () {
+            res.redirect("/login");
+          });
+        }
+      );
+    } else {
+      const alert = errors.array();
+      res.render("register", {
+        alert,
       });
     }
-  );
-});
+  }
+);
 app.get("/logout", (req, res) => {
   req.logout();
   res.redirect("/");
@@ -110,10 +131,10 @@ function isLoggedIn(req, res, next) {
 }
 
 //Listen On Server
-app.listen(process.env.PORT || 3000, function (err) {
+app.listen(process.env.PORT || 3001, function (err) {
   if (err) {
     console.log(err);
   } else {
-    console.log("Server Started At Port 3000");
+    console.log("Server Started At Port 3001");
   }
 });

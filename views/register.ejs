@@ -1,6 +1,11 @@
 <%- include('header'); %> <%- include('nav'); %>
 <main>
   <h3>Sign Up</h3>
+  <% if(typeof alert != 'undefined') { %> <% alert.forEach(function(error) { %>
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <%= error.msg %>
+  </div>
+  <% }) %> <% } %>
   <form action="/register" method="POST">
     <label for="username">Username</label>
     <input type="text" id="username" name="username" />
