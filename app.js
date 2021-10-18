@@ -90,6 +90,11 @@ app.post(
     check("password")
       .isLength({ min: 1 })
       .withMessage("Please enter a password"),
+    check("email").isEmail().withMessage("Please enter a valid email"),
+    check("phone")
+      .isLength(10)
+      .withMessage("Phone number length must be 10 digits long"),
+    check("phone").isNumeric().withMessage("Please enter a valid phone number"),
   ],
   (req, res) => {
     const errors = validationResult(req);
